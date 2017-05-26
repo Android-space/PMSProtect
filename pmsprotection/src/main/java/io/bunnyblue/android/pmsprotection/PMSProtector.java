@@ -2,8 +2,10 @@ package io.bunnyblue.android.pmsprotection;
 
 import android.content.Context;
 import android.content.pm.PackageManager;
+import android.util.Log;
 
 import java.lang.reflect.Field;
+import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.lang.reflect.Proxy;
@@ -16,6 +18,7 @@ public class PMSProtector {
     public static void watchPMS(Context context) {
         Class<?> activityThreadClass = null;
         try {
+
             activityThreadClass = Class.forName("android.app.ActivityThread");
             Method currentActivityThreadMethod =
                     activityThreadClass.getDeclaredMethod("currentActivityThread");
@@ -25,6 +28,10 @@ public class PMSProtector {
             sPackageManagerField.setAccessible(true);
             Object sPackageManager = sPackageManagerField.get(currentActivityThread);
             if (sPackageManager instanceof Proxy) {
+                InvocationHandler invocationHandler = Proxy.getInvocationHandler(sPackageManager);
+                String str = invocationHandler.getClass().getName();
+                //TODO the str is "io.bunnyblue.android.pmshooker.PmsHookBinderInvocationHandler"
+                Log.e("qtfreet00", str);
                 System.err.println(" found bad pms");
                 //TODO sPackageManager is hooked in proxy
             }
